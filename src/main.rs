@@ -3,6 +3,7 @@ use clap::Parser;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use tokio::{task, time};
+use tokio::io::{self, AsyncBufReadExt};
 
 use youtube_chat::live_chat::LiveChatClientBuilder;
 use youtube_chat::item::MessageItem;
@@ -45,6 +46,7 @@ async fn main() {
 }
 
 async fn youtube_chat(args: &Args) {
+    let args2 = args.clone();
     let args = args.clone();
     let chat_message = Arc::new(Mutex::new(String::new()));
 
@@ -76,6 +78,8 @@ async fn youtube_chat(args: &Args) {
         Err(e) => eprintln!("Error starting client: {:?}", e),
     }
 
+    let user_input_task = task::spawn(read_user_input(args2));
+
     let forever = task::spawn(async move {
         let mut interval = time::interval(Duration::from_millis(300));
         loop {
@@ -84,7 +88,7 @@ async fn youtube_chat(args: &Args) {
         }
     });
 
-    forever.await.unwrap();
+    tokio::try_join!(forever, user_input_task).unwrap();
 }
 
 async fn process_chat_completion(args: &Args, content: String) {
@@ -123,7 +127,7 @@ async fn process_chat_completion(args: &Args, content: String) {
 }
 
 fn narrate_message(message: &str) {
-    let re = Regex::new(r"[^\w\s.,?!]").unwrap();
+    let re = Regex::new(r"[^\w\s.,?!]|<채팅>|</채팅>|<바둑자신>|</바둑자신>|<바둑상대>|</바둑상대>").unwrap();
     let cleaned_message = re.replace_all(message, "");
     let parts: Vec<&str> = cleaned_message.split(|c| c == '.' || c == ',' || c == '!' || c == '?').collect();
 
@@ -134,5 +138,33 @@ fn narrate_message(message: &str) {
     };
     for part in parts {
         let _ = narrator.speak(part);
+    }
+}
+
+async fn read_user_input(args: Args) {
+    let mut reader = io::BufReader::new(io::stdin());
+    let mut buffer = String::new();
+
+    loop {
+        match reader.read_line(&mut buffer).await {
+            Ok(_) => {
+                println!("User input: {}", buffer.trim());
+                let user_message = buffer.trim();
+                let user_message_clone = if user_message.starts_with("나:") {
+                    format!("<바둑자신>{}</바둑자신>", user_message.trim_start_matches("나:"))
+                } else if user_message.starts_with("너:") {
+                    format!("<바둑상대>{}</바둑상대>", user_message.trim_start_matches("너:"))
+                } else {
+                    user_message.to_string()
+                };
+                let args_clone = args.clone();
+                tokio::spawn(async move {
+                    process_chat_completion(&args_clone, user_message_clone).await;
+                });
+                // 사용자 입력 처리
+                buffer.clear();
+            }
+            Err(e) => eprintln!("Error reading line: {:?}", e),
+        }
     }
 }

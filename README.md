@@ -1,66 +1,38 @@
 # AI-Vtuber
-This code is designed to read chat messages from YouTube and then utilize OpenAI's GPT-3 language model to generate responses. The output from GPT-3 is then read out loud using a TTS (Text-to-Speech) engine provided by ElevenLabs.
-
+인공지능으로 작동하는 바둑 버튜버 개발을 목표로 하고있습니다.
+이 코드는 YouTube의 채팅 메시지를 읽은 다음 OpenAI의 GPT-4 모델을 사용하여 응답을 생성하도록 설계할 예정입니다.
+GPT-4의 출력은 ElevenLabs에서 제공하는 TTS엔진을 사용하여 읽도록 합니다.
 
 
 # Setup
 Install dependencies
 ```
-git clone https://github.com/Koischizo/AI-Vtuber/
-cd AI-Vtuber
-pip install -r requirements.txt
+git clone https://github.com/GG-O-BP/ai_korean_go_vtuber.git
+cd ai_korean_go_vtuber
+cargo build
 ```
-It also requires [`ffmpeg`](https://ffmpeg.org/) to be installed
 
 # Usage
-
-Edit the variables `EL_key` and `OAI_key` in `config.json`
-
-`EL_key` is the API key for [ElevenLabs](https://beta.elevenlabs.io/). Found in Profile Settings
-
-`OAI_key` is the API key for OpenAI. Found [here](https://platform.openai.com/account/api-keys)
-
-Then run `run.py`
-
-### Default TTS
 ```
-python run.py -id STREAMID 
+cargo run -- --liveid "스트림id"
 ```
-### Elevenlabs TTS
-```
-python run.py -id STREAMID -tts EL 
-```
-then you're set
+
 ## Notes
+"스트림id"를 실제 라이브 스트림의 id로 입력해주세요.
+
 Replace `STREAMID` with the stream's ID that you can find on the Youtube Stream link
 
-You can change the voice by changing `voice` in `config.json`. You can find the ID's [here](https://api.elevenlabs.io/docs) in `Get Voices`
-
-
-
-# Live Demo
-[Livestream 1](https://www.youtube.com/watch?v=rSrkpsWZjyg)
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=rSrkpsWZjyg
-" target="_blank"><img src="http://img.youtube.com/vi/rSrkpsWZjyg/0.jpg" 
-alt="" width="240" height="180" border="10" /></a>
-
-[Livestream 2](https://www.youtube.com/watch?v=GB4eJUxxNY4)
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=GB4eJUxxNY4
-" target="_blank"><img src="http://img.youtube.com/vi/GB4eJUxxNY4/0.jpg" 
-alt="" width="240" height="180" border="10" /></a>
-
 # Other
-I used [This VTS plugin](https://lualucky.itch.io/vts-desktop-audio-plugin) and [VB Audio cable](https://vb-audio.com/Cable/) to make her mouth move and be able to play music at the same time
 
-Please note that this project was created solely for fun and as part of a YouTube video, so the quality and reliability of the code may be questionable. Also, after the completion of the project checklist, there won't be much activity in updating or improving this repository. Nonetheless, we hope that this project can serve as a source of inspiration for anyone interested in building their own AI Vtuber.
-
-- [x] Clean up
-- [ ] GUI
-- [ ] Executables (exe, bat or sh)
-- [ ] Extra features (maybe) (Prompt injection protection, questions only mode, virtual audio)
+- [O] rust로 수정
+- [O] youtube 라이브채팅을 읽음
+- [O] 읽은 채팅을 tts로 출력
+- [ ] 읽은 채팅으로 Chat-GPT 응답을 생성
+- [ ] 바둑의 해설첨삭에 따른 대사 생성
+- [ ] 바둑의 수에 따른 대사 생성
+- [ ] 바둑AI로 응수를 생성
+- [ ] 바둑AI를 통한 참고도 생성
+- [ ] 바둑AI와 chat-GPT를 조합한 해설 생성
 
 # License
 This program is under the [MIT license](/LICENSE) 
-

@@ -1,0 +1,12 @@
+[package]
+name = "ai_korean_go_vtuber"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.4.16", features = ["derive"] }
+tokio = { version = "1.35.1", features = ["full"]}
+tts_rust = "0.3.5"
+youtube_chat = "0.2.1"

@@ -31,6 +31,9 @@ name = "ai_korean_go_vtuber"
 version = "0.1.0"
 dependencies = [
  "clap 4.4.16",
+ "lazy_static",
+ "openai-api-rs",
+ "regex",
  "tokio",
  "tts_rust",
  "youtube_chat",
@@ -1097,6 +1100,8 @@ dependencies = [
  "once_cell",
  "rustls",
  "rustls-webpki",
+ "serde",
+ "serde_json",
  "webpki-roots",
 ]
 
@@ -1305,6 +1310,17 @@ name = "once_cell"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+
+[[package]]
+name = "openai-api-rs"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e895226f6262f62451eced4129986ac6642a42cbb92a99ba9596ba9a0fde5485"
+dependencies = [
+ "minreq",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "openssl"

@@ -27,7 +27,7 @@ Replace `STREAMID` with the stream's ID that you can find on the Youtube Stream 
 - [x] rust로 수정
 - [x] youtube 라이브채팅을 읽음
 - [x] 읽은 채팅을 tts로 출력
-- [ ] 읽은 채팅으로 Chat-GPT 응답을 생성
+- [x] 읽은 채팅으로 Chat-GPT 응답을 생성
 - [ ] 바둑의 해설첨삭에 따른 대사 생성
 - [ ] 바둑의 수에 따른 대사 생성
 - [ ] 바둑AI로 응수를 생성

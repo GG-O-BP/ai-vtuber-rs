@@ -1,5 +1,5 @@
 [package]
-name = "ai_korean_go_vtuber"
+name = "ai-vtuber-rs"
 version = "0.1.0"
 edition = "2021"
 

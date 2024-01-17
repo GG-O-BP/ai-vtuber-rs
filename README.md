@@ -7,32 +7,27 @@ GPT-4의 출력은 ElevenLabs에서 제공하는 TTS엔진을 사용하여 읽�
 # Setup
 Install dependencies
 ```
-git clone https://github.com/GG-O-BP/ai_korean_go_vtuber.git
-cd ai_korean_go_vtuber
+git clone https://github.com/GG-O-BP/ai-vtuber-rs.git
+cd ai-vtuber-rs
 cargo build
 ```
 
 # Usage
 ```
-cargo run -- --liveid "스트림id"
+cargo run -- --liveid "스트림id" --openaikey "OpenAI key" --prompt "프롬프트"
 ```
 
 ## Notes
 "스트림id"를 실제 라이브 스트림의 id로 입력해주세요.
-
-Replace `STREAMID` with the stream's ID that you can find on the Youtube Stream link
+"OpenAI key"에 실제 OpenAI key를 입력해주세요.
+"프롬프트"에 원하는 형태의 스트리밍을 입력해주세요.
+ex) "꿈모라는 이름의 유머러스하고 재미있는 성격의 10대 소년 유튜브 스트리머입니다. 텍스트가 입력되면, 그는 내용을 읽고 가능하다면 자신의 경험을 공유하기도 하고 그 내용에 대해 자세히 설명합니다."
 
 # Other
 
-- [x] rust로 수정
 - [x] youtube 라이브채팅을 읽음
 - [x] 읽은 채팅을 tts로 출력
 - [x] 읽은 채팅으로 Chat-GPT 응답을 생성
-- [x] 바둑의 해설첨삭에 따른 대사 생성
-- [ ] 바둑의 수에 따른 대사 생성
-- [ ] 바둑AI로 응수를 생성
-- [ ] 바둑AI를 통한 참고도 생성
-- [ ] 바둑AI와 chat-GPT를 조합한 해설 생성
 
 # License
 This program is under the [MIT license](/LICENSE) 

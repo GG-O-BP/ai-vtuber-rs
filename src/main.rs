@@ -20,10 +20,13 @@ use tts_rust::languages::Languages;
 #[derive(Parser, Debug, Clone)]
 struct Args {
     #[clap(long)]
-    liveid: String,
-    #[clap(long)]
     openaikey: String,
+    #[clap(long)]
+    prompt: String,
+    #[clap(long)]
+    liveid: String,
 }
+
 
 lazy_static! {
     static ref MESSAGES: Mutex<Vec<chat_completion::ChatCompletionMessage>> = Mutex::new(Vec::new());
@@ -34,7 +37,7 @@ async fn main() {
     let args = Args::parse();
     let message = chat_completion::ChatCompletionMessage {
         role: chat_completion::MessageRole::system,
-        content: chat_completion::Content::Text(String::from("유머러스하고 재미있는 성격의 10대 소년 스트리머입니다. 만약 <채팅>내용</채팅>형태의 텍스트가 입력되면, 그는 내용을 읽고 가능하다면 자신의 경험을 공유하기도 하고 그 내용에 대해 자세히 설명합니다. 그는 바둑을 두고있으며, 만약 <바둑자신>내용</바둑자신>형태의 텍스트가 입력되면, 그 내용은 그자신이 한 행동이며 거기에 맞게 바둑을 두고있는 상대방에게 익사이팅하게 말합니다. 만약 <바둑상대>내용</바둑상대>형태의 텍스트가 입력되면, 그 내용은 상대방이 한 행동이며 내용에 맞게 바둑을 두고있는 상대방에게 익사이팅하게 말합니다.")),
+        content: chat_completion::Content::Text(String::from(args.prompt.clone())), // args.prompt를 복제합니다.
         name: None,
     };
     {
@@ -42,32 +45,34 @@ async fn main() {
         messages.push(message);
     }
 
-    youtube_chat(&args).await;
+    let args = Arc::new(args);
+    youtube_chat(args).await;
 }
 
-async fn youtube_chat(args: &Args) {
-    let args2 = args.clone();
-    let args = args.clone();
+async fn youtube_chat(args: Arc<Args>) {
+    let args_clone_for_chat = Arc::clone(&args);
     let chat_message = Arc::new(Mutex::new(String::new()));
 
     let chat_message_clone = Arc::clone(&chat_message);
     let mut client = LiveChatClientBuilder::new()
         .live_id(args.liveid.to_string())
         .on_chat(move |chat_item| {
-            let mut message = chat_message_clone.lock().unwrap();
-            match &chat_item.message[0] {
-                MessageItem::Text(text_message) => {
-                    *message = text_message.clone();
-                },
-                _ => {
-                    eprintln!("Unsupported message type");
+            let message = {
+                let mut message_guard = chat_message_clone.lock().unwrap();
+                match &chat_item.message[0] {
+                    MessageItem::Text(text_message) => {
+                        *message_guard = text_message.clone();
+                    },
+                    _ => {
+                        eprintln!("Unsupported message type");
+                    }
                 }
-            }
-            println!("{:?}", &*message);
-            let args_clone = args.clone();
-            let message_clone = format!("<채팅>{}</채팅>", message.clone());
+                println!("{:?}", &*message_guard);
+                message_guard.clone()
+            };
+            let args_clone = Arc::clone(&args_clone_for_chat);
             tokio::spawn(async move {
-                process_chat_completion(&args_clone, message_clone).await;
+                process_chat_completion(args_clone.openaikey.clone(), message).await;
             });
         })
         .on_error(|error| eprintln!("{:?}", error))
@@ -78,7 +83,7 @@ async fn youtube_chat(args: &Args) {
         Err(e) => eprintln!("Error starting client: {:?}", e),
     }
 
-    let user_input_task = task::spawn(read_user_input(args2));
+    let user_input_task = task::spawn(read_user_input(args.openaikey.clone()));
 
     let forever = task::spawn(async move {
         let mut interval = time::interval(Duration::from_millis(300));
@@ -91,8 +96,8 @@ async fn youtube_chat(args: &Args) {
     tokio::try_join!(forever, user_input_task).unwrap();
 }
 
-async fn process_chat_completion(args: &Args, content: String) {
-    let client = Client::new(args.openaikey.to_string());
+async fn process_chat_completion(openaikey: String, content: String) {
+    let client = Client::new(openaikey);
 
     let message = chat_completion::ChatCompletionMessage {
         role: chat_completion::MessageRole::user,
@@ -127,7 +132,7 @@ async fn process_chat_completion(args: &Args, content: String) {
 }
 
 fn narrate_message(message: &str) {
-    let re = Regex::new(r"[^\w\s.,?!]|<채팅>|</채팅>|<바둑자신>|</바둑자신>|<바둑상대>|</바둑상대>").unwrap();
+    let re = Regex::new(r"[^\w\s.,?!\-]").unwrap();
     let cleaned_message = re.replace_all(message, "");
     let parts: Vec<&str> = cleaned_message.split(|c| c == '.' || c == ',' || c == '!' || c == '?').collect();
 
@@ -141,7 +146,7 @@ fn narrate_message(message: &str) {
     }
 }
 
-async fn read_user_input(args: Args) {
+async fn read_user_input(openaikey: String) {
     let mut reader = io::BufReader::new(io::stdin());
     let mut buffer = String::new();
 
@@ -149,17 +154,10 @@ async fn read_user_input(args: Args) {
         match reader.read_line(&mut buffer).await {
             Ok(_) => {
                 println!("User input: {}", buffer.trim());
-                let user_message = buffer.trim();
-                let user_message_clone = if user_message.starts_with("나:") {
-                    format!("<바둑자신>{}</바둑자신>", user_message.trim_start_matches("나:"))
-                } else if user_message.starts_with("너:") {
-                    format!("<바둑상대>{}</바둑상대>", user_message.trim_start_matches("너:"))
-                } else {
-                    user_message.to_string()
-                };
-                let args_clone = args.clone();
+                let user_message = buffer.trim().to_string();
+                let openaikey_clone = openaikey.clone();
                 tokio::spawn(async move {
-                    process_chat_completion(&args_clone, user_message_clone).await;
+                    process_chat_completion(openaikey_clone, user_message).await;
                 });
                 // 사용자 입력 처리
                 buffer.clear();

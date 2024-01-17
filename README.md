@@ -1,5 +1,5 @@
 # AI-Vtuber
-We are aiming to develop Vtuber, which works with AI.
+I am aiming to develop Vtuber, which works with AI.
 This code is designed to read chat messages from YouTube and generate responses using OpenAI's GPT-4 model.
 The output of GPT-4 is outputted through tts_rust.
 

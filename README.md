@@ -1,8 +1,12 @@
 # AI-Vtuber
-인공지능으로 작동하는 버튜버 개발을 목표로 하고있습니다.
-이 코드는 YouTube의 채팅 메시지를 읽은 다음 OpenAI의 GPT-4 모델을 사용하여 응답을 생성하도록 설계하였습니다.
-GPT-4의 출력은 tts_rust로 출력합니다.
+We are aiming to develop Vtuber, which works with AI.
+This code is designed to read chat messages from YouTube and generate responses using OpenAI's GPT-4 model.
+The output of GPT-4 is outputted through tts_rust.
 
+
+## View in other languages
+
+[**English**](./README.md), [한국어](./README.ko.md)
 
 # Setup
 Install dependencies
@@ -14,25 +18,24 @@ cargo build
 
 # Usage
 ```
-cargo run -- --liveid "스트림id" --openaikey "OpenAI key" --prompt "프롬프트"
+cargo run -- --liveid "stream_id" --openaikey "OpenAI key" --prompt "prompt"
 ```
 
 ## Notes
-"스트림id"를 실제 라이브 스트림의 id로 입력해주세요.
+"stream_id" should be replaced with the actual id of the live stream.
 
-"OpenAI key"에 실제 OpenAI key를 입력해주세요.
+"OpenAI key" should be replaced with the actual OpenAI key.
 
-"프롬프트"에 원하는 형태의 스트리밍을 입력해주세요.
+Please enter the desired form of streaming in the "prompt".
 
-ex) "꿈모라는 이름의 유머러스하고 재미있는 성격의 10대 소년 유튜브 스트리머입니다. 텍스트가 입력되면, 그는 내용을 읽고 가능하다면 자신의 경험을 공유하기도 하고 그 내용에 대해 자세히 설명합니다."
-
+ex) "Kkumora is a humorous and fun teenage boy streamer on YouTube. When a text is entered, he reads the content and, if possible, shares his experiences and explains the content in detail."
 
 
 # Other
 
-- [x] youtube 라이브채팅을 읽음
-- [x] 읽은 채팅을 tts로 출력
-- [x] 읽은 채팅으로 Chat-GPT 응답을 생성
+- [x] Reads YouTube live chat
+- [x] Outputs read chat through tts
+- [x] Generates Chat-GPT responses from read chat
 
 # License
 This program is under the [MIT license](/LICENSE) 

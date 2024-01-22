@@ -122,6 +122,15 @@ async fn process_chat_completion(openaikey: String, content: String) {
             match &response.choices[0].message.content {
                 Some(content) => {
                     println!("Content: {}", content);
+                    let response_message = chat_completion::ChatCompletionMessage {
+                        role: chat_completion::MessageRole::assistant,
+                        content: chat_completion::Content::Text(String::from(content)),
+                        name: None,
+                    };
+                    {
+                        let mut messages = MESSAGES.lock().unwrap();
+                        messages.push(response_message);
+                    }
                     narrate_message(&content);
                 }
                 None => println!("Content is empty or not available"),
